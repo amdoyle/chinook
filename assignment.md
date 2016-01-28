@@ -24,24 +24,29 @@ Check out [W3Schools' SQL Reference](http://www.w3schools.com/sql/sql_syntax.asp
 1) Count how many tracks belong to the MediaType "Protected MPEG-4 video file".
 ```SQL
 /* Add your answer below */
+SELECT id FROM media_types WHERE name='Protected MPEG-4 video file'
 
+SELECT SUM(media_type_id) FROM tracks WHERE media_type_id=3;
 ```
 
 2) Find the least expensive Track that has the Genre "Electronica/Dance".
 ```SQL
 /* Add your answer below */
+SELECT id FROM genres WHERE name='Electronica/Dance';
 
+SELECT *  FROM tracks WHERE genre_id=15 ORDER BY unit_price DESC LIMIT 1;
 ```
 
 3) Find the all the Artists whose names start with A.
 ```SQL
 /* Add your answer below */
-
+SELECT * FROM artists WHERE name ILIKE 'A%';
 ```
 
 4) Find all the Tracks that belong to the first Playlist.
 ```SQL
 /* Add your answer below */
+SELECT tracks.name, playlists_tracks.track_id FROM tracks INNER JOIN playlists_tracks  ON  playlists_tracks.track_id=tracks.id;
 
 ```
 
@@ -68,14 +73,26 @@ All these practice examples are making use of some of the most commonplace metho
 ```ruby
 artist = Artist.find(22)
 ```
+```sql
+SELECT  "artists".* FROM "artists" WHERE "artists"."id" = $1 LIMIT 1
+```
 ```ruby
 album = Album.first
+```
+```sql
+SELECT  "albums".* FROM "albums"  ORDER BY "albums"."id" ASC LIMIT 1
 ```
 ```ruby
 track = Track.last
 ```
+```sql
+SELECT  "tracks".* FROM "tracks"  ORDER BY "tracks"."id" DESC LIMIT 1
+```
 ```ruby
 my_playlist = Playlist.find_by(name: "90’s Music")
+```
+```sql
+SELECT  "playlists".* FROM "playlists" WHERE "playlists"."name" = $1 LIMIT 1  [["name", "90's Music"]]
 ```
 
 ##### Retrieving Multiple Objects
@@ -142,26 +159,38 @@ Of course, these can be done as one or more steps.
 1) Count how many tracks belong to the "Hip Hop/Rap" genre
 ```ruby
 # Enter your answer below
+Track.where(genre_id: 17).count
 
 ```
 2) Find the most expensive Track that has the MediaType "MPEG audio file".
 ```ruby
 # Enter your answer below
 
+max_price = Track.where(media_type_id:1).maximum("unit_price")
+#this will find all with the max price
+Track.where(unit_price: max_price)
+#this will just find the first one with this price
+Track.where(unit_price: max_price).first
+
 ```
 3) Find the 2 oldest Artists.
 ```ruby
 # Enter your answer below
+Artist.order(:created_at).limit(2)
+# or to be more specific
+Artist.order(created_at: :asc).limit(2)
 
 ```
 4) Find all the Tracks that belong to the first Playlist.
 ```ruby
-# Enter your answer below
+Playlist.first.tracks
 
 ```
 5) Find all the Tracks that belong to the 2 most recent playlists. *(HINT: This takes at least two ActiveRecord queries)*
 ```ruby
 # Enter your answer below
+recent_playlists = Playlist.order(created_at: :desc)
+most_recent = recent_playlists.limit(2)
+most_recent.map { | playlist | playlist.tracks }
 
 ```
-
